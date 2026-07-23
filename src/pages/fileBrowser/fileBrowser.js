@@ -54,12 +54,12 @@ import util from "./util";
  * @param {boolean} [doesOpenLast]
  * @returns {Promise<import('.').SelectedFile>}
  */
-function FileBrowserInclude(mode, info, doesOpenLast = true) {
+function FileBrowserInclude(mode, info, doesOpenLast = true, startLocation) {
 	mode = mode || "file";
 
 	const IS_FOLDER_MODE = ["folder", "both"].includes(mode);
 	const IS_FILE_MODE = ["file", "both"].includes(mode);
-	const storedState = helpers.parseJSON(localStorage.fileBrowserState) || [];
+	const storedState = startLocation ? [] : helpers.parseJSON(localStorage.fileBrowserState) || [];
 	/**@type {Array<Location>} */
 	const state = [];
 	/**@type {Array<Storage>} */
@@ -543,11 +543,15 @@ function FileBrowserInclude(mode, info, doesOpenLast = true) {
 			document.removeEventListener("resume", reload);
 		};
 
-		if (doesOpenLast && storedState.length) {
-			loadStates(storedState);
-			return;
-		}
-		navigate("/", "/");
+		if (startLocation) {
+	navigate(startLocation.url, startLocation.name);
+	return;
+}
+if (doesOpenLast && storedState.length) {
+	loadStates(storedState);
+	return;
+}
+navigate("/", "/");
 
 		function close() {
 			const err = new Error("User cancelled");

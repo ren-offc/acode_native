@@ -203,10 +203,11 @@ export default {
 		findFile();
 	},
 	files() {
-		FileBrowser("both", strings["file browser"])
-			.then(FileBrowser.open)
-			.catch(FileBrowser.openError);
-	},
+	FileBrowser("both", strings["file browser"], false, {
+		name: "Acode",
+		url: cordova.file.dataDirectory,
+	}).then(FileBrowser.open).catch(FileBrowser.openError);
+},
 	find() {
 		actions("search");
 	},
@@ -279,25 +280,17 @@ export default {
 
 	system.hasGrantedStorageManager((granted) => {
 		if (!granted) {
-			system.requestStorageManager(() => {}, (err) => console.error(err));
+			system.requestStorageManager(
+				() => {},
+				(err) => console.error(err),
+			);
 			return;
 		}
 
-		const previousState = localStorage.fileBrowserState;
-		localStorage.fileBrowserState = JSON.stringify([
-			{ name: "home", url: rootUrl },
-		]);
-
-		FileBrowser("both", "SAF", true)
-			.then(FileBrowser.open)
-			.catch(FileBrowser.openError)
-			.finally(() => {
-				if (previousState) {
-					localStorage.fileBrowserState = previousState;
-				} else {
-					localStorage.removeItem("fileBrowserState");
-				}
-			});
+		FileBrowser("both", "SAF", false, {
+			name: "home",
+			url: rootUrl,
+		}).then(FileBrowser.open).catch(FileBrowser.openError);
 	}, console.error);
 	break;
 }
