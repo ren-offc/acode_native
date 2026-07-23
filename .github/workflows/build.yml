@@ -36,14 +36,20 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      # cordova ada di devDependencies (v13.0.0), jadi npx cordova pakai versi lokal, bukan global
+      # generate file config yang dibutuhin (termasuk .babelrc) sebelum build
+      - name: Project setup
+        run: npm run setup
+
+      # cordova ada di devDependencies (v13.0.0), pakai npx biar pasti kepake versi lokal
       - name: Add Android platform
         run: npx cordova platform add android
 
       # free + fdroid = build tanpa modul IAP/proot (ga butuh signing/billing config)
       # ganti ke "paid" kalau memang butuh varian berbayar, tapi itu biasanya butuh secrets tambahan
+      # pakai "npm run build --" (bukan "sh utils/scripts/build.sh" langsung) biar
+      # node_modules/.bin (cordova, rspack) otomatis masuk PATH
       - name: Build APK (free, debug)
-        run: sh utils/scripts/build.sh free fdroid dev apk
+        run: npm run build -- free fdroid dev apk
 
       - name: Locate built APK(s)
         run: find . -name "*.apk" -not -path "*/node_modules/*" -print
