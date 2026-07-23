@@ -274,6 +274,27 @@ export default {
 				About();
 				break;
 
+			case "saf_browser": {
+				const rootUrl = cordova.file.externalRootDirectory;
+
+				system.hasGrantedStorageManager((granted) => {
+					if (!granted) {
+						system.requestStorageManager(
+							() => {},
+							(err) => console.error(err),
+						);
+						return;
+					}
+
+					localStorage.fileBrowserState = JSON.stringify([
+						{ name: "SD Card", url: rootUrl },
+					]);
+
+					FileBrowser("both", "SAF", true);
+				}, console.error);
+				break;
+			}
+
 			default:
 				return;
 		}
@@ -512,7 +533,6 @@ export default {
 			try {
 				let newUri;
 				if (uri.startsWith("content://com.termux.documents/tree/")) {
-					// Special handling for Termux content files
 					const newFilePath = Url.join(Url.dirname(uri), newname);
 					const content = await fs.readFile();
 					await fsOperation(Url.dirname(uri)).createFile(newname, content);
@@ -542,7 +562,6 @@ export default {
 
 		const didFormat = await acode.format(selectIfNull);
 		if (didFormat) {
-			// Restore cursor position after formatting (pos.row is now 1-based)
 			editor.gotoLine(pos.row, pos.column);
 		}
 	},
@@ -613,7 +632,6 @@ Additional Info:
 		User Agent: ${navigator?.userAgent || "N/A"}
 `;
 
-				// Copy the info to clipboard
 				if (cordova.plugins.clipboard) {
 					cordova.plugins.clipboard.copy(info);
 				}

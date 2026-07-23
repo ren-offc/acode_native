@@ -76,11 +76,12 @@
         </config-file>
 
         <config-file target="AndroidManifest.xml" parent="/manifest">
-            <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-            <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-            <uses-permission android:name="android.permission.WRITE_MEDIA_STORAGE" />
-            <uses-permission android:name="android.permission.VIBRATE" />
-        </config-file>
+          <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+          <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+          <uses-permission android:name="android.permission.WRITE_MEDIA_STORAGE" />
+          <uses-permission android:name="android.permission.VIBRATE" />
+         <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" tools:ignore="ScopedStorage" />
+       </config-file>
 
         <hook type="before_prepare" src="hooks/restore-cordova-resources.js" />
         <hook type="before_prepare" src="hooks/modify-java-files.js" />
