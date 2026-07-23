@@ -1,0 +1,57 @@
+name: Build APK
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      # NOTE: kalau ada gradle-daemon-jvm.properties yang pin versi JDK beda,
+      # sesuaikan java-version di bawah ini.
+      - name: Setup JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Accept licenses & install SDK components
+        run: |
+          yes | sdkmanager --licenses || true
+          sdkmanager --install "platforms;android-36" "build-tools;35.0.0"
+
+      - name: Install dependencies
+        run: npm ci
+
+      # cordova ada di devDependencies (v13.0.0), jadi npx cordova pakai versi lokal, bukan global
+      - name: Add Android platform
+        run: npx cordova platform add android
+
+      # free + fdroid = build tanpa modul IAP/proot (ga butuh signing/billing config)
+      # ganti ke "paid" kalau memang butuh varian berbayar, tapi itu biasanya butuh secrets tambahan
+      - name: Build APK (free, debug)
+        run: sh utils/scripts/build.sh free fdroid dev apk
+
+      - name: Locate built APK(s)
+        run: find . -name "*.apk" -not -path "*/node_modules/*" -print
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: acode-apk
+          path: |
+            **/*.apk
+          if-no-files-found: error
