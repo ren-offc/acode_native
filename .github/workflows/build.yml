@@ -40,9 +40,14 @@ jobs:
       - name: Project setup
         run: npm run setup
 
-      # cordova ada di devDependencies (v13.0.0), pakai npx biar pasti kepake versi lokal
-      - name: Add Android platform
-        run: npx cordova platform add android
+      # npm run setup kadang udah nambahin platform android sendiri, jadi cek dulu biar ga dobel
+      - name: Add Android platform (if not already added)
+        run: |
+          if [ -d "platforms/android" ]; then
+            echo "Platform android udah ada, skip."
+          else
+            npx cordova platform add android
+          fi
 
       # free + fdroid = build tanpa modul IAP/proot (ga butuh signing/billing config)
       # ganti ke "paid" kalau memang butuh varian berbayar, tapi itu biasanya butuh secrets tambahan
