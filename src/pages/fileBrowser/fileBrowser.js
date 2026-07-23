@@ -1683,17 +1683,17 @@ navigate("/", "/");
 		 * Adds a new storage and refresh location
 		 */
 		function addStorage() {
-			util
-				.addPath()
-				.then((res) => {
-					storageList.push(res);
-					localStorage.storageList = JSON.stringify(storageList);
-					reload();
-				})
-				.catch((err) => {
-					helpers.error(err);
-				});
-		}
+	  util
+		.addPath()
+		.then((res) => {
+			storageList.push(res);
+			localStorage.storageList = JSON.stringify(storageList);
+			navigate(res.uri, res.name);
+		})
+		.catch((err) => {
+			helpers.error(err);
+		});
+}
 	});
 }
 
