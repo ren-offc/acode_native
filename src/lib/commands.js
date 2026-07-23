@@ -275,25 +275,32 @@ export default {
 				break;
 
 			case "saf_browser": {
-				const rootUrl = cordova.file.externalRootDirectory;
+	const rootUrl = cordova.file.externalRootDirectory;
 
-				system.hasGrantedStorageManager((granted) => {
-					if (!granted) {
-						system.requestStorageManager(
-							() => {},
-							(err) => console.error(err),
-						);
-						return;
-					}
+	system.hasGrantedStorageManager((granted) => {
+		if (!granted) {
+			system.requestStorageManager(() => {}, (err) => console.error(err));
+			return;
+		}
 
-					localStorage.fileBrowserState = JSON.stringify([
-						{ name: "SD Card", url: rootUrl },
-					]);
+		const previousState = localStorage.fileBrowserState;
+		localStorage.fileBrowserState = JSON.stringify([
+			{ name: "home", url: rootUrl },
+		]);
 
-					FileBrowser("both", "SAF", true);
-				}, console.error);
-				break;
-			}
+		FileBrowser("both", "SAF", true)
+			.then(FileBrowser.open)
+			.catch(FileBrowser.openError)
+			.finally(() => {
+				if (previousState) {
+					localStorage.fileBrowserState = previousState;
+				} else {
+					localStorage.removeItem("fileBrowserState");
+				}
+			});
+	}, console.error);
+	break;
+}
 
 			default:
 				return;
